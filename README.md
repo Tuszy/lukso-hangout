@@ -6,6 +6,8 @@ Immerse yourself into the blocky metaverse and hangout with your friends braggin
 
 [Showcase - Universal Profile](https://universaleverything.io/0xabb60bBc5D2F01fEce7aeF4eAa1A41B3c440Be53?assetGroup=grid)
 
+[1. DEMO VIDEO](https://youtu.be/_xUwnW1zgiI)
+
 ## Motivation
 This mini-application builds upon and broadens the functionality of my [3D Marketplace](https://github.com/Tuszy/lukso-grid-marketplace) project, awarded during the 1st level of the Hack the Grid hackathon.
 
