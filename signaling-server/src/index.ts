@@ -1,0 +1,106 @@
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
+import { getProfileData, ProfileData } from "./getProfileData";
+
+const peerMapping: Record<string, Peer> = {};
+const socketMapping: Record<string, Socket> = {};
+
+export type Peer = {
+  id: string;
+  address: `0x${string}`;
+  data?: ProfileData;
+};
+
+const port = parseInt(process.env.PORT ?? "") || 8888;
+
+const server = createServer();
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
+});
+
+io.on("connection", (client) => {
+  console.log("connected", client.id);
+  socketMapping[client.id] = client;
+
+  let visitor = client.handshake.query.visitor as `0x${string}` | null;
+  const owner = client.handshake.query.owner as `0x${string}`;
+
+  client.on("disconnect", () => {
+    console.log("disconnected", client.id, visitor);
+    delete socketMapping[client.id];
+    delete peerMapping[client.id];
+
+    if (owner) {
+      io.to(owner).emit("leave", client.id);
+    }
+  });
+
+  if (!owner) {
+    console.log("Reject: ", client.id, "Invalid query", client.handshake.query);
+    delete socketMapping[client.id];
+    client.disconnect();
+    return;
+  }
+
+  client.on("join", async (data) => {
+    const profileData = await getProfileData(visitor);
+    if (client.id in peerMapping) return;
+    client.join(owner);
+    const peer = {
+      ...data,
+      data: profileData,
+      id: client.id,
+      address: visitor,
+    };
+    peerMapping[client.id] = peer;
+    client.to(owner).emit("join", peer);
+
+    const peers = [...(io.of("/").adapter.rooms.get(owner) ?? [])]
+      .map((peerId) => peerMapping[peerId])
+      .filter((peer) => peer != null && peer.id !== client.id);
+
+    console.log("PEERS:", peers);
+    client.emit("peers", peers);
+  });
+
+  client.on("update", async (address) => {
+    const profileData = await getProfileData(address);
+    if (!(client.id in peerMapping)) return;
+    visitor = address;
+    const peer = {
+      data: profileData,
+      id: client.id,
+      address: visitor,
+    };
+
+    io.to(owner).emit("update-peer", peer);
+  });
+
+  client.on("buy", (assetId) => {
+    io.to(owner).emit("buy", assetId);
+  });
+
+  client.on("offer", (targetId, offer) => {
+    if (!socketMapping[targetId] || !peerMapping[client.id]) return;
+    socketMapping[targetId].emit("offer", peerMapping[client.id], offer);
+  });
+
+  client.on("answer", (targetId, answer) => {
+    if (!socketMapping[targetId] || !peerMapping[client.id]) return;
+    socketMapping[targetId].emit("answer", peerMapping[client.id], answer);
+  });
+
+  client.on("ice candidate", (targetId, candidate) => {
+    if (!socketMapping[targetId] || !peerMapping[client.id]) return;
+    socketMapping[targetId].emit(
+      "ice candidate",
+      peerMapping[client.id],
+      candidate
+    );
+  });
+});
+
+io.listen(port);
