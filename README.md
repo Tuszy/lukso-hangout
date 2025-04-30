@@ -8,6 +8,14 @@ Immerse yourself into the blocky metaverse and hangout with your friends braggin
 
 [1. DEMO VIDEO](https://youtu.be/_xUwnW1zgiI)
 
+## Important Note
+
+To install this mini-app in your grid, please ensure you paste the complete ``<iframe>`` tag into the text field, not just the URL. This ensures the app can request access to the camera and microphone for audio and video chat.
+
+```html
+<iframe src="https://lukso-grid-hangout.tuszy.com" allow="camera; microphone"></iframe>
+```
+
 ## Motivation
 This mini-application builds upon and broadens the functionality of my [3D Marketplace](https://github.com/Tuszy/lukso-grid-marketplace) project, awarded during the 1st level of the Hack the Grid hackathon.
 
