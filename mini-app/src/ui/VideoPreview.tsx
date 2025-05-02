@@ -4,13 +4,15 @@ import {
   useServerConnection,
 } from "../hooks/useServerConnection";
 import { toast } from "react-toastify";
-import { isImmersed } from "../hooks/useUiState";
+import useUiState, { isImmersed, UiMode } from "../hooks/useUiState";
 import useRole, { Role } from "../hooks/useRole";
+import useVerifyFunction from "../hooks/useVerifyFunction";
 
 function VideoPreview() {
   const videoRef = useRef() as MutableRefObject<HTMLVideoElement | null>;
   const setLocalStream = useServerConnection((state) => state.setLocalStream);
   const stream = useServerConnection((state) => state.localStream);
+  const verifyIdentity = useVerifyFunction();
 
   const preventDefaultAndStopPropagation: React.MouseEventHandler<
     HTMLDivElement
@@ -32,7 +34,7 @@ function VideoPreview() {
 
   useEffect(() => {
     const onKeyPress = (e: KeyboardEvent) => {
-      if (useRole.getState().role !== Role.VISITOR) {
+      if (useUiState.getState().mode !== UiMode.VISITOR) {
         setLocalStream(null);
         return;
       }
@@ -70,6 +72,12 @@ function VideoPreview() {
               });
             });
         }
+      } else if (
+        e.code === "KeyT" &&
+        useRole.getState().role !== Role.NONE &&
+        !useRole.getState().verified
+      ) {
+        verifyIdentity();
       }
     };
 

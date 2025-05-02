@@ -1,6 +1,12 @@
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
-import { getProfileData, ProfileData } from "./getProfileData";
+import {
+  getProfileData,
+  JSON_RPC_PROVIDER,
+  ProfileData,
+} from "./getProfileData";
+import { abi as LSP0ERC725AccountABI } from "@lukso/lsp0-contracts/artifacts/LSP0ERC725Account.json";
+import { Contract, id, Interface, JsonRpcApiProvider } from "ethers";
 
 const peerMapping: Record<string, Peer> = {};
 const socketMapping: Record<string, Socket> = {};
@@ -9,6 +15,7 @@ export type Peer = {
   id: string;
   address: `0x${string}`;
   data?: ProfileData;
+  verified: boolean;
 };
 
 const port = parseInt(process.env.PORT ?? "") || 8888;
@@ -20,6 +27,8 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
+const LSP0ERC725AccountABIInterface = new Interface(LSP0ERC725AccountABI);
 
 io.on("connection", (client) => {
   console.log("connected", client.id);
@@ -54,6 +63,7 @@ io.on("connection", (client) => {
       data: profileData,
       id: client.id,
       address: visitor,
+      verified: false,
     };
     peerMapping[client.id] = peer;
     client.to(owner).emit("join", peer);
@@ -74,6 +84,7 @@ io.on("connection", (client) => {
       data: profileData,
       id: client.id,
       address: visitor,
+      verified: false,
     };
 
     io.to(owner).emit("update-peer", peer);
@@ -81,6 +92,19 @@ io.on("connection", (client) => {
 
   client.on("buy", (assetId) => {
     io.to(owner).emit("buy", assetId);
+  });
+
+  client.on("verify", async ({ signature, hash }) => {
+    const up = new Contract(
+      visitor as string,
+      LSP0ERC725AccountABIInterface,
+      JSON_RPC_PROVIDER
+    );
+
+    if (await up.isValidSignature(hash, signature)) {
+      peerMapping[client.id].verified = true;
+      io.to(owner).emit("verified", client.id);
+    }
   });
 
   client.on("offer", (targetId, offer) => {

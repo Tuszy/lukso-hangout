@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import useWorld from "../hooks/useWorld";
 import { useUpProvider } from "../context/UpProvider";
 import { ServerPeer, useServerConnection } from "./useServerConnection";
+import useRole from "./useRole";
 
 const STUN_SERVER_CONFIG = {
   iceServers: [
@@ -35,12 +36,14 @@ export const useSocket = () => {
   const removePeer = useServerConnection((state) => state.removePeer);
   const removeAllPeers = useServerConnection((state) => state.removeAllPeers);
   const addBoughtAssetById = useWorld((state) => state.addBoughtAssetById);
+  const setVerified = useRole((state) => state.setVerified);
 
   useEffect(() => {
     if (socket === null || (socket?.hasListeners("connect") ?? false)) return;
 
     socket.on("connect", () => {
       console.log("SOCKET IO CONNECTED");
+      setVerified(false);
       socket?.emit("join");
     });
 
@@ -52,6 +55,15 @@ export const useSocket = () => {
     socket.on("join", addServerPeer);
 
     socket.on("leave", removePeer);
+
+    socket.on("verified", (id) => {
+      if (!id) return;
+      if (id === socket.id) {
+        setVerified(true);
+      } else if (useServerConnection.getState().peers[id]) {
+        useServerConnection.getState().peers[id].verified = true;
+      }
+    });
 
     socket.on("peers", async (serverPeers: ServerPeer[]) => {
       for (const serverPeer of serverPeers) {
@@ -91,7 +103,7 @@ export const useSocket = () => {
         channel.onopen = () => console.log("DATA CHANNEL OPEN");
         channel.onmessage = ({ data }) => {
           const peer = useServerConnection.getState().peers[serverPeer.id];
-          peer.position = JSON.parse(data);
+          if (peer) peer.position = JSON.parse(data);
         };
 
         const peer = {

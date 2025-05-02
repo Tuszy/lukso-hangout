@@ -112,6 +112,11 @@ function Scene() {
     }
   }, [ui, onLock, onUnlock, setCurrentAssetToPlace]);
 
+  useEffect(() => {
+    if (!upContext.isWaitingForTx) return;
+    onUnlock();
+  }, [onUnlock, upContext.isWaitingForTx]);
+
   return (
     <div className="h-screen w-screen">
       <KeyboardControls map={map}>

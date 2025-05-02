@@ -118,6 +118,15 @@ function VisitorControls() {
                 <div className="flex items-center justify-center col-span-2">
                   AUDIO CHAT
                 </div>
+
+                <div className="flex items-center justify-center">
+                  <div className="w-12 h-12 grid place-content-center bg-gray-200 text-black p-1 rounded-xl border-gray-400 border-2 font-bold text-xl">
+                    T
+                  </div>
+                </div>
+                <div className="flex items-center justify-center col-span-2">
+                  VERIFICATION
+                </div>
               </>
             )}
 

@@ -10,7 +10,7 @@ function HoveredPeerPreview() {
     return peers[hoveredPeerId];
   }, [peers, hoveredPeerId]);
 
-  if (peer === null) {
+  if (!peer) {
     return null;
   }
 
@@ -61,7 +61,10 @@ function HoveredPeerPreview() {
       <div className="fixed bottom-2 left-2 max-w-100 text-white font-bold border-2 border-white/50 shadow-2xl backdrop-blur-lg bg-black/40 rounded-lg overflow-hidden flex flex-col items-center justify-center gap-1 z-10 select-none">
         <div>
           <div className={`w-full text-center text-md p-1 px-2`}>
-            <span>{peer.data?.name ?? peer.address ?? "Anonymous Guest"}</span>
+            <span>
+              {peer.data?.name ?? peer.address ?? "Anonymous Guest"}{" "}
+              {peer.verified ? "✅" : ""}
+            </span>
           </div>
         </div>
       </div>

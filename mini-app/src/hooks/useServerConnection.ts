@@ -30,6 +30,7 @@ export type ServerPeer = {
   id: string;
   address: `0x${string}` | null;
   data?: ProfileData;
+  verified: boolean;
 };
 
 export type Peer = ServerPeer & {
@@ -56,6 +57,7 @@ export const useServerConnection = create(
             ...state,
             socket,
             peers: {},
+            localStream: !socket ? null : state.localStream,
           };
         }),
       setLocalStream: (localStream: MediaStream | null) =>

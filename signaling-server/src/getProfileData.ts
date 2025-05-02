@@ -1,7 +1,9 @@
 import { ERC725 } from "@erc725/erc725.js";
+import { ethers } from "ethers";
 
 export const IPFS_GATEWAY = "https://ipfs-gateway.tuszy.com/ipfs/";
 export const RPC_ENDPOINT = "https://rpc.mainnet.lukso.network";
+export const JSON_RPC_PROVIDER = new ethers.JsonRpcProvider(RPC_ENDPOINT);
 
 export const ipfsUrl = (url: string) =>
   url.replace(/([^:])\/{2,}/g, "$1/").replace("ipfs://", IPFS_GATEWAY);
