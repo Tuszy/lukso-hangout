@@ -6,7 +6,8 @@ import {
   ProfileData,
 } from "./getProfileData";
 import { abi as LSP0ERC725AccountABI } from "@lukso/lsp0-contracts/artifacts/LSP0ERC725Account.json";
-import { Contract, id, Interface, JsonRpcApiProvider } from "ethers";
+import { Contract, hashMessage, Interface } from "ethers";
+import { SiweMessage } from "siwe";
 
 const peerMapping: Record<string, Peer> = {};
 const socketMapping: Record<string, Socket> = {};
@@ -76,25 +77,18 @@ io.on("connection", (client) => {
     client.emit("peers", peers);
   });
 
-  client.on("update", async (address) => {
-    const profileData = await getProfileData(address);
-    if (!(client.id in peerMapping)) return;
-    visitor = address;
-    const peer = {
-      data: profileData,
-      id: client.id,
-      address: visitor,
-      verified: false,
-    };
-
-    io.to(owner).emit("update-peer", peer);
-  });
-
   client.on("buy", (assetId) => {
     io.to(owner).emit("buy", assetId);
   });
 
-  client.on("verify", async ({ signature, hash }) => {
+  client.on("verify", async (data) => {
+    if (!data.message || !data.signature) return;
+    const { signature, message } = data;
+    const siweMessage = new SiweMessage(message);
+    const nonce = client.id.replace(/[^a-zA-Z0-9]/g, "");
+    if (siweMessage.nonce !== nonce) return;
+    const hash = hashMessage(message);
+
     const up = new Contract(
       visitor as string,
       LSP0ERC725AccountABIInterface,

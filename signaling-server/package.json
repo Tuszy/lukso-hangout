@@ -23,6 +23,7 @@
     "@lukso/lsp0-contracts": "^0.15.0",
     "bcrypt": "^5.1.1",
     "ethers": "^6.13.7",
+    "siwe": "^3.0.0",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0",
     "webrtc-adapter": "^9.0.1",

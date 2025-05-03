@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { useUpProvider } from "../context/UpProvider";
 
 // Ethers
-import { getAddress, hashMessage } from "ethers";
+import { getAddress } from "ethers";
 import { SiweMessage } from "siwe";
 import { lukso } from "viem/chains";
 // Toast
@@ -18,7 +18,8 @@ function useVerifyFunction() {
   const role = useRole((state) => state.role);
 
   return useCallback(async () => {
-    if (role === Role.NONE || !upContext.client) {
+    const socketId = useServerConnection.getState().socket?.id;
+    if (role === Role.NONE || !socketId || !upContext.client) {
       return;
     }
 
@@ -27,8 +28,8 @@ function useVerifyFunction() {
 
     const savePromise = new Promise((resolve, reject) => {
       console.log("Starting to verify the identity...");
-
-      const siweMessage = new SiweMessage({
+      const nonce = socketId.replace(/[^a-zA-Z0-9]/g, "");
+      const message = new SiweMessage({
         domain: window.location.host,
         address,
         statement:
@@ -37,11 +38,11 @@ function useVerifyFunction() {
         version: "1",
         chainId: lukso.id,
         resources: ["https://lukso-grid-hangout.tuszy.com"],
+        nonce,
       }).prepareMessage();
-      const hash = hashMessage(siweMessage);
       return upContext.client
-        .signMessage({ account: address, message: siweMessage })
-        .then((signature: string) => resolve({ address, signature, hash }))
+        .signMessage({ account: address, message })
+        .then((signature: string) => resolve({ signature, message }))
         .catch((e: unknown) => {
           console.log("Failed to verify your identity.");
           reject(e);
