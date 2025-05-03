@@ -8,6 +8,8 @@ Immerse yourself into the blocky metaverse and hangout with your friends braggin
 
 [1. DEMO VIDEO](https://youtu.be/_xUwnW1zgiI)
 
+[2. DEMO VIDEO - Multiplayer](https://youtu.be/NbCwuWxaT6U)
+
 ## Important Note
 
 To install this mini-app in your grid, please ensure you paste the complete ``<iframe>`` tag into the text field, not just the URL. This ensures the app can request access to the camera and microphone for audio and video chat.
