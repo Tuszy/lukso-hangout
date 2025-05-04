@@ -65,3 +65,5 @@ The mini-app identifies the owner by comparing the context account to the connec
 - MINI-APP: [https://lukso-grid-hangout.tuszy.com](https://lukso-grid-hangout.tuszy.com)
 
 - SIGNALING SERVER FOR SETTING UP P2P CONNECTION OVER WEB-RTC: [https://lukso-grid-hangout-backend.tuszy.com](https://lukso-grid-hangout-backend.tuszy.com)
+
+- USED TEXTURE PACK - AyjiPack [https://www.planetminecraft.com/texture-pack/ayjis-pack/](https://www.planetminecraft.com/texture-pack/ayjis-pack/)
