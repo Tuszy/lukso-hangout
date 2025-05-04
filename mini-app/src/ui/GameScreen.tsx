@@ -1,8 +1,14 @@
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { LoadingBackdrop } from "./LoadingBackDrop";
 
 import { useUpProvider } from "../context/UpProvider";
-import useUiState, { UiMode, UiState } from "../hooks/useUiState";
+import useUiState, {
+  isBuilderMode,
+  isNotImmersed,
+  isVisitorMode,
+  UiMode,
+  UiState,
+} from "../hooks/useUiState";
 import useRole, { Role } from "../hooks/useRole";
 import CurrentMode from "./CurrentMode";
 import UnsavedChanges from "./UnsavedChanges";
@@ -19,12 +25,29 @@ import { Bounce, ToastContainer } from "react-toastify";
 import VideoPreview from "./VideoPreview";
 import Scene from "../objects/Scene";
 import { SocketProvider } from "../context/SocketProvider";
+import { currentAssetActive } from "../hooks/useCurrentAsset";
 
 export const GameScreen = () => {
   const upContext = useUpProvider();
   const ui = useUiState((state) => state.ui);
   const mode = useUiState((state) => state.mode);
   const role = useRole((state) => state.role);
+
+  useEffect(() => {
+    const onWheel = (e: WheelEvent) => {
+      if (isBuilderMode() || isNotImmersed() || currentAssetActive()) {
+        return;
+      }
+      e.stopPropagation();
+      e.preventDefault();
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+    };
+  }, []);
 
   return (
     <SocketProvider>

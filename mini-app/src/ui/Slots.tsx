@@ -63,7 +63,7 @@ function Slots() {
     };
 
     window.addEventListener("keypress", onKeyPress);
-    window.addEventListener("wheel", onWheel);
+    window.addEventListener("wheel", onWheel, { passive: false });
 
     return () => {
       window.removeEventListener("keypress", onKeyPress);

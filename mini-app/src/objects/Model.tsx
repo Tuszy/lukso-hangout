@@ -85,7 +85,11 @@ export const Model = ({
 
   return (
     <group
-      position={[0, -box3.min.y * scale, 0]}
+      position={[
+        (-(box3.min.x + box3.max.x) / 2) * scale,
+        -box3.min.y * scale,
+        (-(box3.min.z + box3.max.z) / 2) * scale,
+      ]}
       scale={scale}
       rotation={rotation}
       frustumCulled={false}

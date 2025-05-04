@@ -97,14 +97,24 @@ function AssetToPlace() {
         return;
       }
 
+      let anyKeyPressed = false;
       if (e.code === "BracketRight") {
         incrementScale();
+        anyKeyPressed = true;
       } else if (e.code === "Slash") {
         decrementScale();
+        anyKeyPressed = true;
       } else if (e.code === "Digit0") {
         resetOffsetYRotationScale();
+        anyKeyPressed = true;
       } else if (e.code === "KeyB") {
         setAttachToBlock(!blockAttachingIsActive());
+        anyKeyPressed = true;
+      }
+
+      if (anyKeyPressed) {
+        e.stopPropagation();
+        e.preventDefault();
       }
     };
 
@@ -138,6 +148,16 @@ function AssetToPlace() {
       } else if (e.code === "ArrowRight") {
         keymap.current.arrowRight = true;
       }
+
+      if (
+        keymap.current.arrowUp ||
+        keymap.current.arrowDown ||
+        keymap.current.arrowLeft ||
+        keymap.current.arrowRight
+      ) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
@@ -155,7 +175,7 @@ function AssetToPlace() {
     window.addEventListener("keypress", onKeyPress);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("wheel", onWheel);
+    window.addEventListener("wheel", onWheel, { passive: false });
 
     return () => {
       window.removeEventListener("keypress", onKeyPress);

@@ -1,3 +1,4 @@
+import { MutableRefObject, useEffect, useRef } from "react";
 import {
   blockSizeOnTexture,
   blockTypes,
@@ -8,6 +9,33 @@ import texture from "../material/texture.png";
 const BLOCK_SIZE = blockSizeOnTexture + "px";
 
 function BlockInventory() {
+  const rootRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const scrollRef = useRef() as MutableRefObject<HTMLDivElement>;
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const onWheel = (e: WheelEvent) => {
+      if (scrollRef.current) {
+        let current = e.target;
+        while (current) {
+          if (current === scrollRef.current) return;
+          // @ts-expect-error exists
+          current = current?.parentNode;
+        }
+      }
+      e.stopPropagation();
+      e.preventDefault();
+    };
+
+    const ref = rootRef.current;
+
+    ref.addEventListener("wheel", onWheel, { passive: false });
+
+    return () => {
+      ref.removeEventListener("wheel", onWheel);
+    };
+  }, []);
+
   const onDrag: React.DragEventHandler<HTMLDivElement> = (e) => {
     // @ts-expect-error It exists...
     const index = parseInt(e.target.getAttribute("block-index"));
@@ -22,7 +50,10 @@ function BlockInventory() {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center select-none p-4 backdrop-blur-md">
+    <div
+      ref={rootRef}
+      className="fixed inset-0 flex items-center justify-center select-none p-4 backdrop-blur-md"
+    >
       <div
         className="text-white font-bold border-2 border-white/50 shadow-2xl backdrop-blur-lg bg-black/40 rounded-lg p-2 flex-col"
         onClick={preventDefaultAndStopPropagation}
@@ -32,7 +63,10 @@ function BlockInventory() {
             BLOCK INVENTORY
           </div>
         </div>
-        <div className="max-h-[50vh] gap-2 flex flex-wrap items-center justify-center overflow-y-auto py-1">
+        <div
+          ref={scrollRef}
+          className="max-h-[50vh] gap-2 flex flex-wrap items-center justify-center overflow-y-auto py-1"
+        >
           {blockTypes.map((block, index) => (
             <div
               key={index}
