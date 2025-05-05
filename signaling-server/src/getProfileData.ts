@@ -2,8 +2,23 @@ import { ERC725 } from "@erc725/erc725.js";
 import { ethers } from "ethers";
 
 export const IPFS_GATEWAY = "https://ipfs-gateway.tuszy.com/ipfs/";
-export const RPC_ENDPOINT = "https://rpc.mainnet.lukso.network";
-export const JSON_RPC_PROVIDER = new ethers.JsonRpcProvider(RPC_ENDPOINT);
+
+export const LUKSO_MAINNET_CHAIN_ID = 42;
+export const LUKSO_TESTNET_CHAIN_ID = 4201;
+
+export const RPC_ENDPOINT: Record<number, string> = {
+  [LUKSO_MAINNET_CHAIN_ID]: "https://rpc.mainnet.lukso.network",
+  [LUKSO_TESTNET_CHAIN_ID]: "https://rpc.testnet.lukso.network",
+};
+
+export const JSON_RPC_PROVIDER: Record<number, ethers.JsonRpcProvider> = {
+  [LUKSO_MAINNET_CHAIN_ID]: new ethers.JsonRpcProvider(
+    RPC_ENDPOINT[LUKSO_MAINNET_CHAIN_ID]
+  ),
+  [LUKSO_TESTNET_CHAIN_ID]: new ethers.JsonRpcProvider(
+    RPC_ENDPOINT[LUKSO_TESTNET_CHAIN_ID]
+  ),
+};
 
 export const ipfsUrl = (url: string) =>
   url.replace(/([^:])\/{2,}/g, "$1/").replace("ipfs://", IPFS_GATEWAY);
@@ -31,7 +46,8 @@ const erc725schema = [
 ];
 
 export const getProfileData = async (
-  address: `0x${string}` | null
+  address: `0x${string}` | null,
+  chainId: number
 ): Promise<ProfileData> => {
   if (address === null) {
     return {
@@ -40,7 +56,7 @@ export const getProfileData = async (
   }
 
   try {
-    const erc725 = new ERC725(erc725schema, address, RPC_ENDPOINT, {
+    const erc725 = new ERC725(erc725schema, address, RPC_ENDPOINT[chainId], {
       ipfsGateway: IPFS_GATEWAY,
     });
     const { value } = await erc725.fetchData("LSP3Profile");

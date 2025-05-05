@@ -13,9 +13,10 @@
  */
 "use client";
 
+import { useMemo } from "react";
 import { createClientUPProvider } from "@lukso/up-provider";
 import { createWalletClient, custom } from "viem";
-import { lukso } from "viem/chains";
+import { lukso, luksoTestnet } from "viem/chains";
 import {
   createContext,
   useContext,
@@ -38,6 +39,7 @@ interface UpProviderContext {
   isConnected: boolean;
   visitor: `0x${string}` | null;
   owner: `0x${string}` | null;
+  chainId: number;
 }
 
 export const UpContext = createContext<UpProviderContext | undefined>(
@@ -57,18 +59,17 @@ interface UpProviderProps {
 }
 
 const provider = createClientUPProvider();
-const client = createWalletClient({
-  chain: lukso,
-  transport: custom(provider),
-});
 
 export function UpProvider({ children }: UpProviderProps) {
   const setWallet = useWalletStore((state) => state.setWallet);
+  const updateWalletBalance = useWalletStore(
+    (state) => state.updateWalletBalance
+  );
   const setMode = useUiState((state) => state.setMode);
   const setRole = useRole((state) => state.setRole);
   const [isWaitingForTx, setIsWaitingForTx] = useState<boolean>(false);
 
-  const [chainId, setChainId] = useState<number>(lukso.id);
+  const [chainId, setChainId] = useState<number>(0);
   const [accounts, setAccounts] = useState<Array<`0x${string}`>>([]);
   const [contextAccounts, setContextAccounts] = useState<Array<`0x${string}`>>(
     []
@@ -76,6 +77,16 @@ export function UpProvider({ children }: UpProviderProps) {
 
   const visitor = accounts[0] ?? null;
   const owner = contextAccounts[0] ?? null;
+
+  const client = useMemo(() => {
+    if (provider && chainId) {
+      return createWalletClient({
+        chain: chainId === lukso.id ? lukso : luksoTestnet,
+        transport: custom(provider),
+      });
+    }
+    return null;
+  }, [chainId]);
 
   useEffect(() => {
     let mounted = true;
@@ -116,6 +127,7 @@ export function UpProvider({ children }: UpProviderProps) {
 
       const chainChanged = (_chainId: number) => {
         setChainId(_chainId);
+        updateWalletBalance();
       };
 
       provider.on("accountsChanged", accountsChanged);

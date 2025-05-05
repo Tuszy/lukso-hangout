@@ -36,7 +36,7 @@ function useVerifyFunction() {
           "I want to verify my identity so other people in this world can be sure that I am not an impostor.",
         uri: window.location.origin,
         version: "1",
-        chainId: lukso.id,
+        chainId: upContext.chainId,
         resources: ["https://lukso-grid-hangout.tuszy.com"],
         nonce,
       }).prepareMessage();

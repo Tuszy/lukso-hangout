@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import BurntPixFractalABI from "../json/BurntPixFractal.json";
-import { JSON_RPC_PROVIDER } from "../constants";
+import { _n, JSON_RPC_PROVIDER } from "../constants";
 import { Image } from "./assets";
 
 const getAddressFromBytes32 = (bytes32: `0x${string}`) =>
@@ -13,7 +13,7 @@ const burntPixHandler = async (id: `0x${string}`) => {
   const fractal = new ethers.Contract(
     getAddressFromBytes32(id),
     BurntPixFractalABI,
-    JSON_RPC_PROVIDER
+    _n(JSON_RPC_PROVIDER)
   );
   const svg = await fractal.image();
   const img = new Blob([svg], { type: "image/svg+xml" });

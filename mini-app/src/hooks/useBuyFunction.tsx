@@ -8,7 +8,7 @@ import { useUpProvider } from "../context/UpProvider";
 import { ethers, TransactionReceipt } from "ethers";
 
 // Constants
-import { JSON_RPC_PROVIDER, LSP8_MARKETPLACE } from "../constants";
+import { _n, JSON_RPC_PROVIDER, LSP8_MARKETPLACE } from "../constants";
 
 // ABI
 import LSP8MarketplaceABI from "../json/LSP8Marketplace.json";
@@ -31,7 +31,7 @@ function useBuyFunction() {
       upContext.setIsWaitingForTx(true);
 
       const contract = new ethers.Contract(
-        LSP8_MARKETPLACE,
+        _n(LSP8_MARKETPLACE) as string,
         LSP8MarketplaceABI,
         upContext.client
       );
@@ -46,13 +46,13 @@ function useBuyFunction() {
         upContext.client
           .sendTransaction({
             account: buyer,
-            to: LSP8_MARKETPLACE,
+            to: _n(LSP8_MARKETPLACE),
             value: listing.price,
             data,
           })
           .then((tx: `0x${string}`) => {
             console.log("TX:", tx);
-            return JSON_RPC_PROVIDER.waitForTransaction(tx);
+            return _n(JSON_RPC_PROVIDER).waitForTransaction(tx);
           })
           .then((receipt: TransactionReceipt) => {
             console.log("RECEIPT:", receipt);

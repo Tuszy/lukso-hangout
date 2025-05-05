@@ -4,7 +4,9 @@ Immerse yourself into the blocky metaverse and hangout with your friends braggin
 
 <img src="logo.jpg" alt="logo" height="250"/>
 
-[Showcase - Universal Profile](https://universaleverything.io/0xabb60bBc5D2F01fEce7aeF4eAa1A41B3c440Be53?assetGroup=grid)
+[Showcase - Universal Profile - MAINNET](https://universaleverything.io/0xabb60bBc5D2F01fEce7aeF4eAa1A41B3c440Be53?assetGroup=grid)
+
+[Showcase - Universal Profile - TESTNET](https://universaleverything.io/0xeDe44390389A98441ff2B9dDCe862fFAC9BeB0cd?assetGroup=grid)
 
 [1. DEMO VIDEO](https://youtu.be/_xUwnW1zgiI)
 

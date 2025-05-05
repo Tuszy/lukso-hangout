@@ -31,6 +31,7 @@ export type ServerPeer = {
   address: `0x${string}` | null;
   data?: ProfileData;
   verified: boolean;
+  chainId: number;
 };
 
 export type Peer = ServerPeer & {
@@ -91,8 +92,12 @@ export const useServerConnection = create(
       addServerPeers: (newPeers: ServerPeer[]) =>
         set((state) => {
           const peers = { ...state.peers };
+          const chainId = parseInt(window.lukso.chainId);
           for (const serverPeer of newPeers) {
-            if (serverPeer.id in state.peers) {
+            if (
+              serverPeer.id in state.peers ||
+              serverPeer.chainId !== chainId
+            ) {
               continue;
             }
             peers[serverPeer.id] = {
@@ -112,7 +117,10 @@ export const useServerConnection = create(
         }),
       addServerPeer: (serverPeer: ServerPeer) =>
         set((state) => {
-          if (serverPeer.id in state.peers) return state;
+          const chainId = parseInt(window.lukso.chainId);
+          if (serverPeer.id in state.peers || serverPeer.chainId !== chainId) {
+            return state;
+          }
 
           return {
             ...state,
@@ -131,7 +139,10 @@ export const useServerConnection = create(
         }),
       addPeer: (peer: Peer) =>
         set((state) => {
-          if (state.peers[peer.id] === peer) return state;
+          const chainId = parseInt(window.lukso.chainId);
+          if (state.peers[peer.id] === peer || peer.chainId !== chainId) {
+            return state;
+          }
 
           if (state.localStream && peer.connection) {
             for (const track of state.localStream.getTracks()) {

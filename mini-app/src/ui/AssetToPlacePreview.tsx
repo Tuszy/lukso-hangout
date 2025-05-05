@@ -148,7 +148,7 @@ function AssetToPlacePreview() {
             </div>
             <div className="p-2">
               <img
-                className="rounded-md w-40 h-40 border-4 border-black"
+                className="rounded-md w-40 h-40 border-4 border-black object-contain"
                 src={assetToPlace.images[0].url!}
                 loading="lazy"
               />

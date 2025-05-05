@@ -13,6 +13,7 @@ import LSP4DigitalAssetMetadata from "@lukso/lsp4-contracts/artifacts/LSP4Digita
 import { collectionHandler } from "./collectionHandler";
 import { INTERFACE_IDS } from "@lukso/lsp-smart-contracts";
 import {
+  _n,
   IPFS_GATEWAY,
   JSON_RPC_PROVIDER,
   LSP8_LISTINGS,
@@ -76,8 +77,8 @@ async function getLSP8Listing(
     ])
   );
 
-  const listingId = await JSON_RPC_PROVIDER.getStorage(
-    LSP8_LISTINGS,
+  const listingId = await _n(JSON_RPC_PROVIDER).getStorage(
+    _n(LSP8_LISTINGS),
     listingIdSlot
   );
   if (listingId === ethers.ZeroHash) {
@@ -91,15 +92,15 @@ async function getLSP8Listing(
   );
 
   const [/*owner, */ price, active] = (await Promise.all([
-    //JSON_RPC_PROVIDER.getStorage(LSP8_LISTINGS, listingDataSlot + 2n),
-    JSON_RPC_PROVIDER.getStorage(LSP8_LISTINGS, listingDataSlot + 4n),
-    LSP8ListingsContract.isActiveListing(listingId),
+    // _n(JSON_RPC_PROVIDER).getStorage(LSP8_LISTINGS, listingDataSlot + 2n),
+    _n(JSON_RPC_PROVIDER).getStorage(_n(LSP8_LISTINGS), listingDataSlot + 4n),
+    _n(LSP8ListingsContract).isActiveListing(listingId),
   ])) as `0x${string}`[];
 
   if (!active) return null;
 
   return {
-    id: listingId,
+    id: listingId as `0x${string}`,
     // owner: ethers.getAddress(ethers.dataSlice(owner, 12)),
     price,
   };
@@ -288,7 +289,7 @@ const getLSP7AssetID = async (
   const assetContract = new ethers.Contract(
     address,
     LSP7DigitalAsset.abi,
-    JSON_RPC_PROVIDER
+    _n(JSON_RPC_PROVIDER)
   );
 
   const balance = await assetContract.balanceOf(account);
@@ -356,7 +357,7 @@ const getLSP8AssetsIDs = async (
   const assetContract = new ethers.Contract(
     collection,
     LSP8IdentifiableDigitalAsset.abi,
-    JSON_RPC_PROVIDER
+    _n(JSON_RPC_PROVIDER)
   );
   const tokenIds = await assetContract.tokenIdsOf(account);
 
@@ -366,7 +367,7 @@ const getLSP8AssetsIDs = async (
 export const getAssetIDs = async (
   account: `0x${string}`
 ): Promise<string[]> => {
-  const erc725js = new ERC725(LSP3ProfileSchema, account, RPC_ENDPOINT);
+  const erc725js = new ERC725(LSP3ProfileSchema, account, _n(RPC_ENDPOINT));
 
   console.time("FETCHING LSP5ReceivedAssets[]");
   const receivedAssets = await erc725js.getData("LSP5ReceivedAssets[]");
@@ -410,9 +411,14 @@ export const getAssetIDs = async (
 };
 
 const getAssetData = async (address: `0x${string}`) => {
-  const lsp4Metadata = new ERC725(digitalAssetSchema, address, RPC_ENDPOINT, {
-    ipfsGateway: IPFS_GATEWAY,
-  });
+  const lsp4Metadata = new ERC725(
+    digitalAssetSchema,
+    address,
+    _n(RPC_ENDPOINT),
+    {
+      ipfsGateway: IPFS_GATEWAY,
+    }
+  );
 
   const cachedData = await db.cache.get({
     key: address,
@@ -440,7 +446,7 @@ const getAssetData = async (address: `0x${string}`) => {
     const assetContract = new ethers.Contract(
       address,
       LSP4DigitalAssetMetadata.abi,
-      JSON_RPC_PROVIDER
+      _n(JSON_RPC_PROVIDER)
     );
 
     const isLSP8 = await assetContract.supportsInterface(
@@ -485,7 +491,7 @@ const getTokenMetadataUrl = async (
     const collectionContract = new ethers.Contract(
       address,
       LSP8IdentifiableDigitalAsset.abi,
-      JSON_RPC_PROVIDER
+      _n(JSON_RPC_PROVIDER)
     );
     const data = await collectionContract.getDataForTokenId(
       tokenId,

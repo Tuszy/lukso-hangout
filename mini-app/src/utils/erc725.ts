@@ -1,5 +1,5 @@
 import ERC725 from "@erc725/erc725.js";
-import { RPC_ENDPOINT } from "../constants";
+import { _n, RPC_ENDPOINT } from "../constants";
 
 const IPFS_GATEWAY = "https://ipfs.tuszy.com/ipfs/";
 const ERC725Y_HANGOUT_WORLD_KEY = "Hangout:World";
@@ -31,7 +31,7 @@ export const encodeWorldData = (url: string, data: object) => {
 };
 
 export const loadWorld = async (address: `0x${string}`) => {
-  const erc725 = new ERC725(schemas, address, RPC_ENDPOINT, {
+  const erc725 = new ERC725(schemas, address, _n(RPC_ENDPOINT), {
     ipfsGateway: IPFS_GATEWAY,
   });
 
@@ -42,7 +42,7 @@ export const loadWorld = async (address: `0x${string}`) => {
 };
 
 export const getWorldHash = async (address: `0x${string}`) => {
-  const erc725 = new ERC725(schemas, address, RPC_ENDPOINT, {
+  const erc725 = new ERC725(schemas, address, _n(RPC_ENDPOINT), {
     ipfsGateway: IPFS_GATEWAY,
   });
 

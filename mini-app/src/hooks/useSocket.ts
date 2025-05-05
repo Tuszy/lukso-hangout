@@ -253,11 +253,12 @@ export const useSocket = () => {
           query: {
             visitor: upContext.visitor,
             owner: upContext.owner,
+            chainId: upContext.chainId.toString(),
           },
         })
       );
     }
-  }, [upContext.visitor]);
+  }, [upContext.visitor, upContext.chainId]);
 
   return socket;
 };

@@ -2,7 +2,7 @@
 import { useCallback } from "react";
 
 // Provider
-import { JSON_RPC_PROVIDER } from "../constants";
+import { _n, JSON_RPC_PROVIDER } from "../constants";
 import { useUpProvider } from "../context/UpProvider";
 
 // QNA Contract
@@ -63,7 +63,7 @@ function useSaveWorldFunction() {
                 })
                 .then((tx: `0x${string}`) => {
                   console.log("TX:", tx);
-                  return JSON_RPC_PROVIDER.waitForTransaction(tx);
+                  return _n(JSON_RPC_PROVIDER).waitForTransaction(tx);
                 })
                 .then((receipt: TransactionReceipt) => {
                   console.log("RECEIPT:", receipt);

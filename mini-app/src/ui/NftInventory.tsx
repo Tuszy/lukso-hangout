@@ -67,7 +67,7 @@ function NftInventory() {
           >
             <div className="text-xl font-bold">{assetPreview.name}</div>
             <img
-              className="rounded-md w-72 h-72 border-4 border-black"
+              className="rounded-md w-72 h-72 border-4 border-black object-contain"
               src={assetPreview.images[0].url!}
               loading="lazy"
               draggable={false}
@@ -247,7 +247,7 @@ const NftItem = ({
       >
         <img
           draggable={false}
-          className="rounded-md w-28 h-28"
+          className="rounded-md w-28 h-28 object-contain"
           src={asset.images[0].url!}
           loading="lazy"
         />

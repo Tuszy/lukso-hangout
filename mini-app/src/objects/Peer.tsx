@@ -72,7 +72,10 @@ export const Peer = ({ peer }: { peer: PeerType }) => {
   const ratio = useMemo(() => peer.data?.img?.ratio ?? 1, [peer]);
 
   const imageScale = useMemo(
-    () => [IMAGE_SIZE_FACTOR, IMAGE_SIZE_FACTOR * ratio] as [number, number],
+    () =>
+      ratio >= 1
+        ? [IMAGE_SIZE_FACTOR / ratio, IMAGE_SIZE_FACTOR]
+        : ([IMAGE_SIZE_FACTOR, IMAGE_SIZE_FACTOR * ratio] as [number, number]),
     [ratio]
   );
 
